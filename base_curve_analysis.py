@@ -3,6 +3,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.pylab as pl
 
 '''This script will load data from a csv file and fit a curve to the base material being tested'''
 
@@ -23,6 +24,9 @@ def split_data(data, displacement_level):
 
     output1 = split_disp[idx1]
     output2 = split_disp[idx2]
+
+    output1[:,3] = output1[:,3]-output1[0,3]
+    output2[:,3] = output2[:,3]-output2[0,3]
 
     output = [output1, output2]
 
@@ -148,7 +152,7 @@ def plot_poly3(polyfunc, displacement_list, force_list):
     plt.figure()
     plt.plot(-aggregate_disp, aggregate_forces, '.b')
     plt.plot(x_poly, polyfunc(x_poly), 'r')
-    plt.show()
+    #plt.show()
 
 
 def get_force_error_bounds(polyfunc, target_forces, eps):
@@ -178,8 +182,8 @@ if __name__ == "__main__":
 
     p = []
 
-    for j in range(0, 8):
-        filename = "basecurves_103118/base_curve" + str(j + 1) + "_ds.csv"
+    for j in range(0, 6):
+        filename = "basecurves_111318/base_curve" + str(j + 1) + "_ds.csv"
         #filename = "basecurve2_" + str(j+1) + ".csv"
         data = loadfile(filename)
         target_displacements = np.unique(data[:, 0])
@@ -205,7 +209,7 @@ if __name__ == "__main__":
     f_curves_we_like = []
     d_curves_we_like = []
 
-    ref_curve_idx = 2
+    ref_curve_idx = 4
 
     for i in curves_we_like:
         x_offset = np.amax(np.roots(p[ref_curve_idx])[np.iscomplex(np.roots(p[ref_curve_idx]))==False])-np.amax(np.roots(p[i])[np.iscomplex(np.roots(p[i]))==False])
@@ -217,12 +221,28 @@ if __name__ == "__main__":
 
     plt.figure()
 
+    color = pl.cm.jet(np.linspace(0,1,len(p)))
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+
     for i in range(0, len(p)):
         #p[i].coeffs[5] += -p[ref_curve_idx](-average_disp_curves[-1])[-1] - p[i](-average_disp_curves[-1])[-1]
-        x_offset = np.amax(np.roots(p[ref_curve_idx])[np.iscomplex(np.roots(p[ref_curve_idx]))==False])-np.amax(np.roots(p[i])[np.iscomplex(np.roots(p[i]))==False])
+        #x_offset = np.amax(np.roots(p[ref_curve_idx])[np.iscomplex(np.roots(p[ref_curve_idx]))==False])-np.amax(np.roots(p[i])[np.iscomplex(np.roots(p[i]))==False])
+        y_offset = np.polyval(p[ref_curve_idx],0)-np.polyval(p[i],0)
         #x_offset = np.roots(p[ref_curve_idx])[np.iscomplex(np.roots(p[ref_curve_idx]))==False][1]-np.roots(p[i])[np.iscomplex(np.roots(p[i]))==False][1]
-        plt.plot(-average_disp_curves[-1], p[i](-(average_disp_curves[-1]+x_offset)))
+        #plt.plot(-average_disp_curves[-1], p[i](-(average_disp_curves[-1]+x_offset)),color=color[i])
 
+        plt.plot(-average_disp_curves[-1], p[i](-(average_disp_curves[-1]))+y_offset,color=color[i])
+        #plt.xlim((0,0.045))
+        major_ticks = np.arange(0, 0.06, 0.001)
+        minor_ticks = np.arange(0, 0.06, 0.0001)
+        ax.set_xticks(major_ticks)
+        ax.set_xticks(minor_ticks, minor=True)
+        # And a corresponding grid
+        ax.grid(which='both')
+        # Or if you want different settings for the grids:
+        ax.grid(which='minor', alpha=0.75)
+        ax.grid(which='major', alpha=0.75)
 
     plt.legend(["1", '2', '3', '4', '5', '6','2 rpt','5 rpt'], loc=0)
 
