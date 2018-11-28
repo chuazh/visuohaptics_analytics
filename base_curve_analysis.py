@@ -95,7 +95,7 @@ def plot_raw(segmented_data):
             displacement = -segmented_data[i][j][:, 3]
             plt.plot(displacement, force)
 
-    #plt.show()
+    plt.show()
 
 
 def plot_avgs(displacement_list, force_list):
@@ -182,9 +182,10 @@ if __name__ == "__main__":
 
     p = []
 
-    for j in range(0, 6):
-        filename = "basecurves_111318/base_curve" + str(j + 1) + "_ds.csv"
+    for j in range(0, 1):
+        #filename = "basecurves_111318/base_curve" + str(j + 1) + "_ds.csv"
         #filename = "basecurve2_" + str(j+1) + ".csv"
+        filename = "stress_test/base_curve" + str(j + 1) + "_ds.csv"
         data = loadfile(filename)
         target_displacements = np.unique(data[:, 0])
         segmented_data = []
@@ -209,8 +210,8 @@ if __name__ == "__main__":
     f_curves_we_like = []
     d_curves_we_like = []
 
-    ref_curve_idx = 4
-
+    ref_curve_idx = 0
+    '''
     for i in curves_we_like:
         x_offset = np.amax(np.roots(p[ref_curve_idx])[np.iscomplex(np.roots(p[ref_curve_idx]))==False])-np.amax(np.roots(p[i])[np.iscomplex(np.roots(p[i]))==False])
         f_curves_we_like.append(p[i](-(average_disp_curves[-1]+x_offset)))
@@ -218,7 +219,7 @@ if __name__ == "__main__":
     p_avg = fit_poly3(d_curves_we_like,f_curves_we_like)
     plot_poly3(p_avg,d_curves_we_like,f_curves_we_like)
     plt.show()
-
+    '''
     plt.figure()
 
     color = pl.cm.jet(np.linspace(0,1,len(p)))
